@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return 'Instagram Proxy is running!'
+    return 'Instagram Proxy with Logs is running!'
 
 @app.route('/download_instagram', methods=['POST'])
 def download_instagram():
@@ -20,11 +20,19 @@ def download_instagram():
         payload = f"q={insta_url}&t=media"
 
         snapinsta_resp = requests.post(api_url, headers=headers, data=payload, timeout=10)
+
+        print("=== SNAPINSTA RAW RESPONSE ===")
+        print("Status Code:", snapinsta_resp.status_code)
+        print("Headers:", snapinsta_resp.headers)
+        print("Text:", snapinsta_resp.text[:500])  # тільки перші 500 символів
+
         result = snapinsta_resp.json()
         if result.get("data"):
             return jsonify({"url": result["data"][0]["url"]})
         return jsonify({"error": "No video found"}), 404
     except Exception as e:
+        print("=== SNAPINSTA EXCEPTION ===")
+        print(e)
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
